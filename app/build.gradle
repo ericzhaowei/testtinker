@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+    defaultConfig {
+        applicationId "com.ider.testview"
+        minSdkVersion 21
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    //可选，用于生成application类
+    provided('com.tencent.tinker:tinker-android-anno:1.7.7')
+    //tinker的核心库
+    compile('com.tencent.tinker:tinker-android-lib:1.7.7')
+}
+
+apply plugin: 'com.tencent.tinker.patch'
+tinkerPatch {
+    // 有问题的apk地址
+    oldApk = "D://app-debug.apk"
+    ignoreWarning = false
+    useSign = true
+    buildConfig {
+        tinkerId = "3.0"
+    }
+
+    dex {
+        dexMode = "jar"
+        pattern = ["class*.dex", "assets/secondary-dex-?.jar"]
+        loader = ["com.tencent.tinker.loader.*", "com.ider.testview.SampleApplication"]
+    }
+    lib{
+        pattern = ["lib/armeabi/*.so", "lib/arm64-v8a/*.so", "lib/armeabi-v7a/*.so", "lib/mips/*.so", "lib/mips64/*.so", "lib/x86/*.so", "lib/x86_64/*.so"]
+    }
+    res {
+        pattern = ["res/*", "assets/*", "resources.arsc", "AndroidManifest.xml"]
+        largeModSize = 100
+    }
+    sevenZip {
+        zipArtifact = "com.tencent.mm:SevenZip:1.1.10"
+    }
+
+}
+
+
+
+
